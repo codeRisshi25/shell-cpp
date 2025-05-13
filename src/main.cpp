@@ -29,11 +29,15 @@ std::unordered_map<std::string, CmdHandler> builtins;
 // register the built in methods
 void init_builtins()
 {
+
+  // exit command to break the REPL
   builtins["exit"] = [&](const std::vector<std::string> &args)
   {
     int code = (args.size() > 1) ? std::stoi(args[1]) : 0;
     std::exit(code);
   };
+
+  // echo command to give back whatever the user is typing
   builtins["echo"] = [&](const std::vector<std::string> &args)
   {
     for (size_t i = 1; i < args.size(); ++i)
@@ -41,6 +45,15 @@ void init_builtins()
       std::cout << args[i] << (i + 1 < args.size() ? " " : "");
     };
     std::cout << "\n";
+  };
+
+  // type command to define command types
+  builtins["type"] = [&](const std::vector<std::string> &args)
+  {
+    std::string cmd = (args.size() > 1) ? args[1] : "";
+    bool cmdexists = builtins.count(cmd);
+    if (cmdexists) std::cout << cmd <<" is a shell builtin\n";
+    else std::cout << cmd <<": not found\n";
   };
 };
 
@@ -64,7 +77,8 @@ int main()
     {
       it->second(args);
     }
-    else {
+    else
+    {
       std::cout << input << ": command not found\n";
     }
   }
