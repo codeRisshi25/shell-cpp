@@ -6,6 +6,10 @@
 #include <sys/wait.h>
 #include <functional>
 #include <unordered_map>
+// for file searches
+#include <cstdlib>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 // method to tokenize user inputs into words
 std::vector<std::string> tokenize(const std::string &input)
@@ -18,6 +22,35 @@ std::vector<std::string> tokenize(const std::string &input)
     tokens.push_back(token);
   }
   return tokens;
+}
+
+// method to search for a executable file
+std::string execSearch(std::string exec)
+{
+  const char *value = std::getenv("PATH");
+  if (value == nullptr)
+  {
+    std::cout << "PATH env not found" << std::endl;
+    return "";
+  }
+  std::istringstream iss(value);
+  std::string path;
+  char delimiter = ':';
+
+  while (std::getline(iss, path, delimiter))
+  {
+    try {
+    for(const auto& entry : fs::directory_iterator(path)){
+      if (entry.path().filename() == exec) {
+        return entry.path().generic_string();
+        break;
+      }
+    }
+  } catch (fs::filesystem_error){
+    continue;
+  }
+  }
+  return "";
 }
 
 // take the tokenized args and call the appropriate handler
@@ -52,8 +85,13 @@ void init_builtins()
   {
     std::string cmd = (args.size() > 1) ? args[1] : "";
     bool cmdexists = builtins.count(cmd);
-    if (cmdexists) std::cout << cmd <<" is a shell builtin\n";
-    else std::cout << cmd <<": not found\n";
+    if (cmdexists)
+      std::cout << cmd << " is a shell builtin\n";
+    else {
+      std::string path = execSearch(cmd);
+      if (path != "") std::cout << cmd << " is " << path << " \n";
+      else std::cout << cmd << ": not found\n";
+    }
   };
 };
 
