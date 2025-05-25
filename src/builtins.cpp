@@ -37,17 +37,31 @@ void init_builtins()
     builtins["pwd"] = [](const std::vector<std::string> &args)
     {
         char buffer[PATH_MAX];
-        if (getcwd(buffer, PATH_MAX) != nullptr) {
+        if (getcwd(buffer, PATH_MAX) != nullptr)
+        {
             std::cout << buffer << "\n";
-        } else {
+        }
+        else
+        {
             std::cerr << "pwd: error getting current directory\n";
         }
     };
     builtins["cd"] = [](const std::vector<std::string> &args)
     {
-        std::string dir = (args.size() >1 ? args [1] : "~");
-        char* point = const_cast<char*>(dir.c_str());
-        int rs = chdir(point);
-        if (rs == -1) std::cout << "cd: " << dir << ": No such file or directory" << std::endl;
+        std::string dir = (args.size() > 1 ? args[1] : "~");
+        char *point = const_cast<char *>(dir.c_str());
+        if (dir[0] = '~')
+        {
+            const char *home = std::getenv("HOME");
+            int rs = chdir(home);
+            if (rs == -1)
+                std::cout << "cd: " << dir << ": No such file or directory" << std::endl;
+        }
+        else
+        {
+            int rs = chdir(point);
+            if (rs == -1)
+                std::cout << "cd: " << dir << ": No such file or directory" << std::endl;
+        }
     };
 }
