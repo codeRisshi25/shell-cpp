@@ -46,10 +46,8 @@ void init_builtins()
     builtins["cd"] = [](const std::vector<std::string> &args)
     {
         std::string dir = (args.size() >1 ? args [1] : "~");
-        if (dir[0] == '/'){
-            char* point = const_cast<char*>(dir.c_str());
-            int rs = chdir(point);
-            if (rs == -1) std::cout << "cd: " << dir << ": No such file or directory" << std::endl;
-        }
+        char* point = const_cast<char*>(dir.c_str());
+        int rs = chdir(point);
+        if (rs == -1) std::cout << "cd: " << dir << ": No such file or directory" << std::endl;
     };
 }
