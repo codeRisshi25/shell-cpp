@@ -50,7 +50,7 @@ void init_builtins()
     {
         std::string dir = (args.size() > 1 ? args[1] : "~");
         char *point = const_cast<char *>(dir.c_str());
-        if (dir[0] = '~')
+        if (dir[0] == '~')
         {
             const char *home = std::getenv("HOME");
             int rs = chdir(home);
