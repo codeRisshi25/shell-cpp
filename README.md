@@ -4,6 +4,11 @@
 
 This repository contains a POSIX-compliant shell implementation in C++. It is a project to understand the inner workings of command-line interpreters by building one from scratch.
 
+# Dev Journey 
+~ tokenizer
+- Finite State Machine
+
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
