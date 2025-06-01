@@ -7,7 +7,8 @@
 enum class ParseMode {
     NORMAL,
     IN_SINGLE_QUOTE,
-    IN_DOUBLE_QUOTE
+    IN_DOUBLE_QUOTE,
+    IN_ESCAPE
 };
 
 // custom tokenizer for quoting
@@ -25,6 +26,7 @@ std::vector<std::string> tokenize(const std::string &input)
             if (i==' '){if (!token.empty()) tokens.push_back(token); token.clear(); }
             else if (i == '\'') mode = ParseMode::IN_SINGLE_QUOTE;
             else if (i == '\"') mode = ParseMode::IN_DOUBLE_QUOTE;
+            else if (i == '\\') mode = ParseMode::IN_ESCAPE;
             else {token.push_back(i);};
 
             break;
@@ -41,6 +43,13 @@ std::vector<std::string> tokenize(const std::string &input)
             if (i=='\"') mode = ParseMode::NORMAL;
             else token.push_back(i);
             break;
+
+            case ParseMode:: IN_ESCAPE :
+            if (i=='\\') token.push_back(' ');
+            else {
+             mode = ParseMode::NORMAL;
+             token.push_back(i);
+            }    
         }
     }
     if (!token.empty()) tokens.push_back(token);
