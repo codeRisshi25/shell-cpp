@@ -35,6 +35,7 @@ std::vector<std::string> tokenize(const std::string &input)
             case  ParseMode:: IN_SINGLE_QUOTE:
             // case for single quotes
             if (i=='\'') mode = ParseMode::NORMAL;
+            else if (i == '\\') mode = ParseMode::IN_ESCAPE;
             else token.push_back(i);
             break;
 
