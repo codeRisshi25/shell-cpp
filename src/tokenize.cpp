@@ -22,7 +22,7 @@ std::vector<std::string> tokenize(const std::string &input)
 
     // looping through the arguments for tokens
     for (char i : input)
-    { 
+    {
         switch (mode)
         {
         case ParseMode::NORMAL:
@@ -72,17 +72,18 @@ std::vector<std::string> tokenize(const std::string &input)
         case ParseMode::IN_ESCAPE:
             if (prevMode == ParseMode::IN_DOUBLE_QUOTE)
             {
-                if (i == '\\' || i == '$' || i == '\"') 
+                if (i == '\\' || i == '$' || i == '\"')
                 {
                     token.push_back(i);
                 }
-                else {
+                else
+                {
                     token.push_back('\\');
                     token.push_back(i);
                 }
                 mode = prevMode; // Reset to previous mode
             }
-            else 
+            else
             {
                 // if (i == 'n')
                 //     token.push_back('\n');
@@ -99,17 +100,17 @@ std::vector<std::string> tokenize(const std::string &input)
             break;
         }
     }
-    
+
     // Add any remaining token
     if (!token.empty())
         tokens.push_back(token);
-    
+
     // Check for unclosed quotes or incomplete escape sequences
     if (mode != ParseMode::NORMAL)
     {
         std::cout << "invalid command\n";
         return {};
     }
-    
+
     return tokens;
 }

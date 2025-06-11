@@ -4,8 +4,30 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <limits.h>
+#include <fcntl.h>
 
 std::unordered_map<std::string, CmdHandler> builtins;
+
+void executeBuiltinWithRedirect(const std::vector<std::string>& args, const std::string& filename) {
+    int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        return;
+    }
+    
+    int saved_stdout = dup(STDOUT_FILENO);  // Save original stdout
+    dup2(fd, STDOUT_FILENO);                // Redirect to file
+    close(fd);
+    
+    // Execute builtin
+    auto it = builtins.find(args[0]);
+    if (it != builtins.end()) {
+        it->second(args);
+    }
+    
+    dup2(saved_stdout, STDOUT_FILENO);      // Restore stdout
+    close(saved_stdout);
+}
 
 void init_builtins()
 {

@@ -4,7 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
-#include <sys/wait.h> 
+#include <sys/wait.h>
+#include <fcntl.h>
 
 namespace fs = std::filesystem;
 
@@ -22,41 +23,88 @@ std::string execSearch(std::string exec)
 
   while (std::getline(iss, path, delimiter))
   {
-    try {
-    for(const auto& entry : fs::directory_iterator(path)){
-      if (entry.path().filename() == exec) {
-        return entry.path().generic_string();
-        break;
+    try
+    {
+      for (const auto &entry : fs::directory_iterator(path))
+      {
+        if (entry.path().filename() == exec)
+        {
+          return entry.path().generic_string();
+          break;
+        }
       }
     }
-  } catch (fs::filesystem_error){
-    continue;
-  }
+    catch (fs::filesystem_error)
+    {
+      continue;
+    }
   }
   return "";
 };
 
-void execCmd(std::vector<std::string> cmd){
+void execCmd(std::vector<std::string> cmd)
+{
   // execv require char pointers to C string style array null terminated
-  std::vector<char*> argv;
-  argv.reserve(cmd.size() +1);
-  for (const auto &s : cmd) {
-    argv.push_back(const_cast<char*>(s.c_str()));
+  std::vector<char *> argv;
+  argv.reserve(cmd.size() + 1);
+  for (const auto &s : cmd)
+  {
+    argv.push_back(const_cast<char *>(s.c_str()));
   }
   argv.push_back(nullptr);
 
   // fork a new process and execv
   pid_t pid = fork();
-  if (pid == -1){
+  if (pid == -1)
+  {
     perror("fork");
     return;
   }
-  if (pid == 0) {
-    execvp(argv[0],argv.data());
+  if (pid == 0)
+  {
+    execvp(argv[0], argv.data());
     perror("execv");
     _exit(1);
-  }else {
+  }
+  else
+  {
     int status;
     waitpid(pid, &status, 0);
   }
 };
+
+void execCmdWithRedirect(const std::vector<std::string> &cmd, const std::string &filename)
+{
+  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  if (fd == -1)
+  {
+    perror("open");
+    return;
+  }
+
+  pid_t pid = fork();
+  if (pid == 0)
+  {
+    // Child: redirect stdout to file
+    dup2(fd, STDOUT_FILENO);
+    close(fd);
+
+    std::vector<char *> argv;
+    argv.reserve(cmd.size() + 1);
+    for (const auto &s : cmd)
+    {
+      argv.push_back(const_cast<char *>(s.c_str()));
+    }
+    argv.push_back(nullptr);
+
+    execvp(argv[0], argv.data());
+    perror("execvp");
+    _exit(1);
+  }
+  else
+  {
+    close(fd);
+    int status;
+    waitpid(pid, &status, 0);
+  }
+}
