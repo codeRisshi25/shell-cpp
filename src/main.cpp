@@ -1,191 +1,192 @@
 #include "builtins.hpp"
-#include "tokenize.hpp"
-#include "util.hpp"
 #include "enum.hpp"
 #include "search.hpp"
-#include <iostream>
+#include "tokenize.hpp"
+#include "util.hpp"
 #include <algorithm>
+#include <cstdio>
+#include <iostream>
 #include <termios.h>
 #include <unistd.h>
-#include <cstdio>
 
 class TerminalManager {
 private:
-    struct termios orig_termios;
-    bool raw_mode_enabled = false;
+  struct termios orig_termios;
+  bool raw_mode_enabled = false;
 
 public:
-    void enableRawMode() {
-        if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) return;
-        
-        struct termios raw = orig_termios;
-        raw.c_lflag &= ~(ECHO | ICANON);  // Disable echo and canonical mode
-        raw.c_cc[VMIN] = 1;              // Minimum chars to read
-        raw.c_cc[VTIME] = 0;             // Timeout in deciseconds
-        
-        if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) return;
-        raw_mode_enabled = true;
+  void enableRawMode() {
+    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
+      return;
+
+    struct termios raw = orig_termios;
+    raw.c_lflag &= ~(ECHO | ICANON); // Disable echo and canonical mode
+    raw.c_cc[VMIN] = 1;              // Minimum chars to read
+    raw.c_cc[VTIME] = 0;             // Timeout in deciseconds
+
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+      return;
+    raw_mode_enabled = true;
+  }
+
+  void disableRawMode() {
+    if (raw_mode_enabled) {
+      tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+      raw_mode_enabled = false;
     }
-    
-    void disableRawMode() {
-        if (raw_mode_enabled) {
-            tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-            raw_mode_enabled = false;
-        }
-    }
-    
-    ~TerminalManager() {
-        disableRawMode();
-    }
+  }
+
+  ~TerminalManager() { disableRawMode(); }
 };
 
 std::string readLineWithCompletion() {
-    std::string line;
-    int c;
-    
-    while ((c = getchar()) != EOF) {
-        if (c == '\r' || c == '\n') {
-            std::cout << "\n";
-            break;
-        } else if (c == '\t') {
-            // Handle tab completion
-            auto suggestions = getAuthCompleteSuggestions(globalCommandTrie, line);
-            if (suggestions.empty()) {
-                // No suggestions, just beep or do nothing
-                std::cout << "\a" << std::flush;  // Bell character
-            } else if (suggestions.size() == 1) {
-                std::cout << "\r$ ";
-                for (size_t i = 0; i < line.length(); ++i) {
-                    std::cout << " ";
-                }
-                std::cout << "\r$ ";
-                
-                line = suggestions[0] + " ";
-                std::cout << line ;
-            } else {
-                // Multiple completions - show them
-                std::cout << "\n";
-                for (const auto& suggestion : suggestions) {
-                    std::cout << suggestion << "  ";
-                }
-                std::cout << "\n$ " << line;
-            }
-        } else if (c == 127 || c == '\b') {
-            // Backspace
-            if (!line.empty()) {
-                line.pop_back();
-                std::cout << "\b \b";
-            }
-        } else if (c >= 32 && c <= 126) {
-            // Printable character
-            line += c;
-            std::cout << (char)c;
+  std::string line;
+  int c;
+
+  while ((c = getchar()) != EOF) {
+    if (c == '\r' || c == '\n') {
+      std::cout << "\n";
+      break;
+    } else if (c == '\t') {
+      // Handle tab completion
+      auto suggestions = getAuthCompleteSuggestions(globalCommandTrie, line);
+      if (suggestions.empty()) {
+        // No suggestions, just beep or do nothing
+        std::cout << "\a" << std::flush; // Bell character
+      } else if (suggestions.size() == 1) {
+        std::cout << "\r$ ";
+        for (size_t i = 0; i < line.length(); ++i) {
+          std::cout << " ";
         }
+        std::cout << "\r$ ";
+
+        line = suggestions[0] + " ";
+        std::cout << line;
+      } else {
+        // Multiple completions - show them
+        std::cout << "\n";
+        for (const auto &suggestion : suggestions) {
+          std::cout << suggestion << "  ";
+        }
+        std::cout << "\n$ " << line;
+      }
+    } else if (c == 127 || c == '\b') {
+      // Backspace
+      if (!line.empty()) {
+        line.pop_back();
+        std::cout << "\b \b";
+      }
+    } else if (c >= 32 && c <= 126) {
+      // Printable character
+      line += c;
+      std::cout << (char)c;
     }
-    
-    return line;
+  }
+
+  return line;
 }
 
 int main() {
-    init_builtins();
-    initializeCommandTrie();
-    std::cout << std::unitbuf;
-    std::cerr << std::unitbuf;
+  init_builtins();
+  initializeBuiltInTrie();
+  std::cout << std::unitbuf;
+  std::cerr << std::unitbuf;
 
-    TerminalManager terminal;
-    terminal.enableRawMode();
+  TerminalManager terminal;
+  terminal.enableRawMode();
 
-    out_type redirect_type = out_type::STDOUT;
-    write_mode mode = write_mode::TRUNCATE;
+  out_type redirect_type = out_type::STDOUT;
+  write_mode mode = write_mode::TRUNCATE;
 
-    while (true) {
-        std::cout << "$ ";
-        std::string input = readLineWithCompletion();
-        
-        auto args = tokenize(input);
-        if (args.empty()) continue;
+  while (true) {
+    std::cout << "$ ";
+    std::string input = readLineWithCompletion();
 
-        // search for [">","1>","2>",">>","1>>","2>>"] in the args
-        auto redirect = std::find(args.begin(), args.end(), ">>");
-        redirect_type = out_type::STDOUT;
-        mode = write_mode::APPEND;
+    auto args = tokenize(input);
+    if (args.empty())
+      continue;
 
-        //? Find 1>> if >> not found
-        if (redirect == args.end()) {
-          redirect = std::find(args.begin(), args.end(), "1>>");
-          redirect_type = out_type::STDOUT;
-          mode = write_mode::APPEND;
-        }
+    // search for [">","1>","2>",">>","1>>","2>>"] in the args
+    auto redirect = std::find(args.begin(), args.end(), ">>");
+    redirect_type = out_type::STDOUT;
+    mode = write_mode::APPEND;
 
-        //? Find 2>> if none found
-        if (redirect == args.end()) {
-          redirect = std::find(args.begin(), args.end(), "2>>");
-          redirect_type = out_type::STDERR;
-          mode = write_mode::APPEND;
-        }
-
-        //? Search for truncating redirects
-        if (redirect == args.end()) {
-          redirect = std::find(args.begin(), args.end(), ">");
-          redirect_type = out_type::STDOUT;
-          mode = write_mode::TRUNCATE;
-        }
-        if (redirect == args.end()) {
-          redirect = std::find(args.begin(), args.end(), "1>");
-          redirect_type = out_type::STDOUT;
-          mode = write_mode::TRUNCATE;
-        }
-        if (redirect == args.end()) {
-          redirect = std::find(args.begin(), args.end(), "2>");
-          redirect_type = out_type::STDERR;
-          mode = write_mode::TRUNCATE;
-        }
-
-        //* IMP : MAIN LOGIC TO HANDLE EXECUTION !!!
-        if (redirect != args.end()) {
-          if (redirect + 1 == args.end()) {
-            std::cout << "syntax error: filename after '>'\n";
-            continue;
-          }
-
-          std::string filename = *(redirect + 1);
-          args.erase(redirect, args.end());
-
-          // Now execute with redirection
-          auto it = builtins.find(args[0]);
-          if (it != builtins.end()) {
-            if (redirect_type == out_type::STDERR) {
-              executeBuiltinWithStderrRedirect(args, filename, mode);
-            } else {
-              executeBuiltinWithRedirect(args, filename, mode);
-            }
-          } else {
-            std::string execPath = execSearch(args[0]);
-            if (!execPath.empty()) {
-              if (redirect_type == out_type::STDERR) {
-                execStderrCmdWithRedirect(args, filename, mode);
-              } else {
-                execCmdWithRedirect(args, filename, mode);
-              }
-            } else {
-              std::cout << args[0] << ": command not found\n";
-            }
-          }
-        } else {
-          auto it = builtins.find(args[0]);
-          if (it != builtins.end()) {
-            it->second(args);
-          } else {
-            std::string execPath = execSearch(args[0]);
-            if (execPath != "") {
-              execCmd(args);
-            } else {
-              std::cout << input << ": command not found\n";
-            }
-          }
-        }
+    //? Find 1>> if >> not found
+    if (redirect == args.end()) {
+      redirect = std::find(args.begin(), args.end(), "1>>");
+      redirect_type = out_type::STDOUT;
+      mode = write_mode::APPEND;
     }
 
-    cleanupCommandTrie();
-    return 0;
+    //? Find 2>> if none found
+    if (redirect == args.end()) {
+      redirect = std::find(args.begin(), args.end(), "2>>");
+      redirect_type = out_type::STDERR;
+      mode = write_mode::APPEND;
+    }
+
+    //? Search for truncating redirects
+    if (redirect == args.end()) {
+      redirect = std::find(args.begin(), args.end(), ">");
+      redirect_type = out_type::STDOUT;
+      mode = write_mode::TRUNCATE;
+    }
+    if (redirect == args.end()) {
+      redirect = std::find(args.begin(), args.end(), "1>");
+      redirect_type = out_type::STDOUT;
+      mode = write_mode::TRUNCATE;
+    }
+    if (redirect == args.end()) {
+      redirect = std::find(args.begin(), args.end(), "2>");
+      redirect_type = out_type::STDERR;
+      mode = write_mode::TRUNCATE;
+    }
+
+    //* IMP : MAIN LOGIC TO HANDLE EXECUTION !!!
+    if (redirect != args.end()) {
+      if (redirect + 1 == args.end()) {
+        std::cout << "syntax error: filename after '>'\n";
+        continue;
+      }
+
+      std::string filename = *(redirect + 1);
+      args.erase(redirect, args.end());
+
+      // Now execute with redirection
+      auto it = builtins.find(args[0]);
+      if (it != builtins.end()) {
+        if (redirect_type == out_type::STDERR) {
+          executeBuiltinWithStderrRedirect(args, filename, mode);
+        } else {
+          executeBuiltinWithRedirect(args, filename, mode);
+        }
+      } else {
+        std::string execPath = execSearch(args[0]);
+        if (!execPath.empty()) {
+          if (redirect_type == out_type::STDERR) {
+            execStderrCmdWithRedirect(args, filename, mode);
+          } else {
+            execCmdWithRedirect(args, filename, mode);
+          }
+        } else {
+          std::cout << args[0] << ": command not found\n";
+        }
+      }
+    } else {
+      auto it = builtins.find(args[0]);
+      if (it != builtins.end()) {
+        it->second(args);
+      } else {
+        std::string execPath = execSearch(args[0]);
+        if (execPath != "") {
+          execCmd(args);
+        } else {
+          std::cout << input << ": command not found\n";
+        }
+      }
+    }
+  }
+
+  cleanupCommandTrie();
+  return 0;
 }

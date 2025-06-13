@@ -14,5 +14,5 @@ void executeBuiltinWithRedirect(const std::vector<std::string> &args,
 void executeBuiltinWithStderrRedirect(const std::vector<std::string> &args,
                                       const std::string &filename,
                                       write_mode mode);
-void initializeCommandTrie();
+void initializeBuiltInTrie();
 void cleanupCommandTrie();

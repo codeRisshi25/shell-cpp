@@ -18,6 +18,6 @@ std::vector<std::string> getAuthCompleteSuggestions(SearchNode *root,
 void collectAllCmds(SearchNode *node, const std::string currentWord,
                     std::vector<std::string> &suggestions);
 
-void initializeCommandTrie();
+void initializeBuiltInTrie();
 void cleanupCommandTrie();
 void cleanupSearchNodeRecursive(SearchNode* node); 

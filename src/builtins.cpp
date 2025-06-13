@@ -11,19 +11,19 @@
 std::unordered_map<std::string, CmdHandler> builtins;
 SearchNode *globalCommandTrie = nullptr;
 
-void initializeCommandTrie() {
+void initializeBuiltInTrie() {
   if (globalCommandTrie != nullptr) {
     cleanupCommandTrie();
   }
 
-    globalCommandTrie = new SearchNode();
-    // Insert built-in commands
-    insertSearchNode(globalCommandTrie, "echo");
-    insertSearchNode(globalCommandTrie, "exit");
-    insertSearchNode(globalCommandTrie, "pwd");
-    insertSearchNode(globalCommandTrie, "cd");
-    insertSearchNode(globalCommandTrie, "type");
-    insertSearchNode(globalCommandTrie, "meow");
+  globalCommandTrie = new SearchNode();
+  // Insert built-in commands
+  insertSearchNode(globalCommandTrie, "echo");
+  insertSearchNode(globalCommandTrie, "exit");
+  insertSearchNode(globalCommandTrie, "pwd");
+  insertSearchNode(globalCommandTrie, "cd");
+  insertSearchNode(globalCommandTrie, "type");
+  insertSearchNode(globalCommandTrie, "meow");
 }
 
 void executeBuiltinWithRedirect(const std::vector<std::string> &args,

@@ -1,5 +1,6 @@
 #include "util.hpp"
 #include "enum.hpp"
+#include "search.hpp"
 #include <cstdlib>
 #include <fcntl.h>
 #include <filesystem>
@@ -9,6 +10,35 @@
 #include <unistd.h>
 
 namespace fs = std::filesystem;
+
+void initializeCmdTrie() {
+  if (globalCommandTrie == nullptr) {
+    return;
+  }
+
+  const char *value = std::getenv("PATH");
+  if (value == nullptr) {
+    std::cout << "PATH env not found" << std::endl;
+    throw std::runtime_error("PATH environment variable not found");
+  }
+  std::istringstream iss(value);
+  std::string path;
+  char delimiter = ':';
+
+  while (std::getline(iss, path, delimiter)) {
+    try {
+      for (const auto &entry : fs::directory_iterator(path)) {
+        if (entry.path().filename() == exec) { //! Add the commands the the insertSearchNode one by one
+          return entry.path().generic_string();
+          break;
+        }
+      }
+    } catch (fs::filesystem_error) {
+      continue;
+    }
+  }
+  return "";
+}
 
 std::string execSearch(std::string exec) {
   const char *value = std::getenv("PATH");
