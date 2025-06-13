@@ -1,5 +1,6 @@
 #include "builtins.hpp"
 #include "enum.hpp"
+#include "search.hpp"
 #include "util.hpp"
 #include <cstdlib>
 #include <fcntl.h>
@@ -8,6 +9,22 @@
 #include <unistd.h>
 
 std::unordered_map<std::string, CmdHandler> builtins;
+SearchNode *globalCommandTrie = nullptr;
+
+void initializeCommandTrie() {
+  if (globalCommandTrie != nullptr) {
+    cleanupCommandTrie();
+  }
+
+    globalCommandTrie = new SearchNode();
+    // Insert built-in commands
+    insertSearchNode(globalCommandTrie, "echo");
+    insertSearchNode(globalCommandTrie, "exit");
+    insertSearchNode(globalCommandTrie, "pwd");
+    insertSearchNode(globalCommandTrie, "cd");
+    insertSearchNode(globalCommandTrie, "type");
+    insertSearchNode(globalCommandTrie, "meow");
+}
 
 void executeBuiltinWithRedirect(const std::vector<std::string> &args,
                                 const std::string &filename, write_mode mode) {
@@ -91,6 +108,12 @@ void init_builtins() {
       std::cerr << "pwd: error getting current directory\n";
     }
   };
+  builtins["meow"] = [](const std::vector<std::string> &args) {
+    std::cout << "🐱 Meow! Welcome to MewoShell! 🐾\n";
+    std::cout << "   /\\_/\\  \n";
+    std::cout << "  ( o.o ) \n";
+    std::cout << "   > ^ <  \n";
+  };
   builtins["cd"] = [](const std::vector<std::string> &args) {
     std::string dir = (args.size() > 1 ? args[1] : "~");
     char *point = const_cast<char *>(dir.c_str());
@@ -107,4 +130,12 @@ void init_builtins() {
                   << std::endl;
     }
   };
+}
+
+// cleanup code
+void cleanupCommandTrie() {
+  if (globalCommandTrie != nullptr) {
+    delete globalCommandTrie;
+    globalCommandTrie = nullptr;
+  }
 }

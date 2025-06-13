@@ -1,11 +1,13 @@
 #include "builtins.hpp"
 #include "tokenize.hpp"
 #include "util.hpp"
-#include <iostream>
 #include "enum.hpp"
+#include "search.hpp"
+#include <iostream>
 
 int main() {
   init_builtins();
+  initializeCommandTrie();
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
@@ -17,6 +19,11 @@ int main() {
     std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
+    if (input.back() == '\t') {
+      input.pop_back();
+      auto suggestions = getAuthCompleteSuggestions(globalCommandTrie, input);
+      if (suggestions.size() == 1) input = suggestions[0];
+    }
     auto args = tokenize(input);
 
     if (args.empty())
@@ -99,5 +106,6 @@ int main() {
       }
     }
   }
+  cleanupCommandTrie();
   return 0;
 }
