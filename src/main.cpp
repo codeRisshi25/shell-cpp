@@ -60,8 +60,8 @@ std::string readLineWithCompletion() {
                 }
                 std::cout << "\r$ ";
                 
-                line = suggestions[0];
-                std::cout << line << " ";
+                line = suggestions[0] + " ";
+                std::cout << line ;
             } else {
                 // Multiple completions - show them
                 std::cout << "\n";
