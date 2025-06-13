@@ -1,13 +1,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-struct SearchNode {
-  bool isEndOfCmd;
-  std::unordered_map<char, SearchNode *> children;
-
-  SearchNode() : isEndOfCmd(false) {};
-};
+#include "search.hpp"
+#include <algorithm>
 
 void insertSearchNode(SearchNode *root, const std::string &word) {
   SearchNode *node = root;
@@ -45,6 +40,6 @@ void collectAllCmds(SearchNode *node, const std::string currentWord,
   for (const auto& pair : node->children) {
     char ch = pair.first;
     SearchNode* childNode = pair.second;
-    collectAllCmds(childNode, currentWord+ch, suggestions);
+    collectAllCmds(childNode, currentWord + ch, suggestions);
   }
 }

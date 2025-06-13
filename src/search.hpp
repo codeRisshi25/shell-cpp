@@ -12,8 +12,12 @@ struct SearchNode {
 
 extern SearchNode* globalCommandTrie;
 
-void insertSearchNode(SearchNode *root, std::string &word);
+void insertSearchNode(SearchNode *root, const std::string &word);
 std::vector<std::string> getAuthCompleteSuggestions(SearchNode *root,
                                                     const std::string &prefix);
 void collectAllCmds(SearchNode *node, const std::string currentWord,
                     std::vector<std::string> &suggestions);
+
+void initializeCommandTrie();
+void cleanupCommandTrie();
+void cleanupSearchNodeRecursive(SearchNode* node); 
