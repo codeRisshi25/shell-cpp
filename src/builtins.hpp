@@ -1,11 +1,14 @@
 #pragma once
-#include <vector>
+#include <functional>
 #include <string>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 
-using CmdHandler = std::function<void(const std::vector<std::string>&)>;
+using CmdHandler = std::function<void(const std::vector<std::string> &)>;
 extern std::unordered_map<std::string, CmdHandler> builtins;
 
 void init_builtins();
-void executeBuiltinWithRedirect(const std::vector<std::string>& args, const std::string& filename);
+void executeBuiltinWithRedirect(const std::vector<std::string> &args,
+                                const std::string &filename);
+void executeBuiltinWithStderrRedirect(const std::vector<std::string> &args,
+                                const std::string &filename);
