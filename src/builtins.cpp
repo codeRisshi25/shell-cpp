@@ -1,4 +1,5 @@
 #include "builtins.hpp"
+#include "enum.hpp"
 #include "util.hpp"
 #include <cstdlib>
 #include <fcntl.h>
@@ -9,8 +10,12 @@
 std::unordered_map<std::string, CmdHandler> builtins;
 
 void executeBuiltinWithRedirect(const std::vector<std::string> &args,
-                                const std::string &filename) {
-  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                                const std::string &filename, write_mode mode) {
+  int fd;
+  if (mode == write_mode::TRUNCATE)
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  else
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
   if (fd == -1) {
     perror("open");
     return;
@@ -31,23 +36,28 @@ void executeBuiltinWithRedirect(const std::vector<std::string> &args,
 }
 
 void executeBuiltinWithStderrRedirect(const std::vector<std::string> &args,
-                                      const std::string &filename) {
-  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                                      const std::string &filename,
+                                      write_mode mode) {
+  int fd;
+  if (mode == write_mode::TRUNCATE)
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  else
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
   if (fd == -1) {
     perror("open");
     return;
   }
 
   int saved_stderr = dup(STDERR_FILENO);
-  dup2(fd,STDERR_FILENO);
+  dup2(fd, STDERR_FILENO);
   close(fd);
 
   auto it = builtins.find(args[0]);
-  if (it != builtins.end()){
+  if (it != builtins.end()) {
     it->second(args);
   };
 
-  dup2(saved_stderr,STDERR_FILENO);
+  dup2(saved_stderr, STDERR_FILENO);
   close(saved_stderr);
 }
 

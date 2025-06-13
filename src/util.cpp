@@ -1,4 +1,5 @@
 #include "util.hpp"
+#include "enum.hpp"
 #include <cstdlib>
 #include <fcntl.h>
 #include <filesystem>
@@ -60,8 +61,12 @@ void execCmd(std::vector<std::string> cmd) {
 };
 
 void execCmdWithRedirect(const std::vector<std::string> &cmd,
-                         const std::string &filename) {
-  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                         const std::string &filename, write_mode mode) {
+  int fd;
+  if (mode == write_mode::TRUNCATE)
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  else
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
   if (fd == -1) {
     perror("open");
     return;
@@ -91,8 +96,12 @@ void execCmdWithRedirect(const std::vector<std::string> &cmd,
 }
 
 void execStderrCmdWithRedirect(const std::vector<std::string> &cmd,
-                               const std::string &filename) {
-  int fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                               const std::string &filename, write_mode mode) {
+  int fd;
+  if (mode == write_mode::TRUNCATE)
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  else
+    fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
   if (fd == -1) {
     perror("open");
     return;
