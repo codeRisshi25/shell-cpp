@@ -52,7 +52,7 @@ std::string readLineWithCompletion() {
             auto suggestions = getAuthCompleteSuggestions(globalCommandTrie, line);
             if (suggestions.empty()) {
                 // No suggestions, just beep or do nothing
-                std::cout << "\a";  // Bell character
+                std::cout << "\a" << std::flush;  // Bell character
             } else if (suggestions.size() == 1) {
                 std::cout << "\r$ ";
                 for (size_t i = 0; i < line.length(); ++i) {
@@ -61,7 +61,7 @@ std::string readLineWithCompletion() {
                 std::cout << "\r$ ";
                 
                 line = suggestions[0];
-                std::cout << line;
+                std::cout << line << " ";
             } else {
                 // Multiple completions - show them
                 std::cout << "\n";
