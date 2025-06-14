@@ -104,6 +104,41 @@ std::string readLineWithCompletion() {
       // Printable character
       line += c;
       std::cout << (char)c;
+    } else if (c == 27) {
+      // Handle escape sequences (arrow keys)
+      int next1 = getchar();
+      if (next1 == '[') {
+        int next2 = getchar();
+        if (next2 == 'A') {
+          // Up arrow - replace current line
+          std::string historyLine = handleUpArrow();
+          if (!historyLine.empty()) {
+            // Clear current line
+            std::cout << "\r$ ";
+            for (size_t i = 0; i < line.length(); ++i) {
+              std::cout << " ";
+            }
+            std::cout << "\r$ ";
+
+            // Set new line and display it
+            line = historyLine;
+            std::cout << line;
+          }
+        } else if (next2 == 'B') {
+          // Down arrow - replace current line
+          std::string historyLine = handleDownArrow();
+          // Clear current line
+          std::cout << "\r$ ";
+          for (size_t i = 0; i < line.length(); ++i) {
+            std::cout << " ";
+          }
+          std::cout << "\r$ ";
+
+          // Set new line and display it
+          line = historyLine;  // This might be empty for "current" line
+          std::cout << line;
+        }
+      }
     }
   }
 
