@@ -114,6 +114,7 @@ void init_builtins() {
     displayHistory(restrict);
   };
   builtins["mshell"] = [](const std::vector<std::string> &args) {
+    execCmd({"clear"});
     initWelcome();
   };
   builtins["cd"] = [](const std::vector<std::string> &args) {
