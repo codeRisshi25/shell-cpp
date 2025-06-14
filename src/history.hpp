@@ -5,5 +5,5 @@
 extern std::vector<std::string> commandHistory;
 
 void addToHistory(const std::string& command);
-void displayHistory();
+void displayHistory(int restrict);
 std::vector<std::string> getHistory();

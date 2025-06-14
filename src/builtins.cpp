@@ -110,7 +110,8 @@ void init_builtins() {
     }
   };
   builtins["history"] = [](const std::vector<std::string> &args) {
-    displayHistory();
+    int restrict= (args.size() > 1) ? std::stoi(args[1]) : -1;
+    displayHistory(restrict);
   };
   builtins["meow"] = [](const std::vector<std::string> &args) {
     std::cout << "🐱 Meow! Welcome to MewoShell! 🐾\n";
