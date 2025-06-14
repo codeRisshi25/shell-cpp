@@ -108,6 +108,9 @@ void init_builtins() {
       std::cerr << "pwd: error getting current directory\n";
     }
   };
+  builtins["history"] = [](const std::vector<std::string> &args) {
+    std::cout << "history ~ one direction";
+  };
   builtins["meow"] = [](const std::vector<std::string> &args) {
     std::cout << "🐱 Meow! Welcome to MewoShell! 🐾\n";
     std::cout << "   /\\_/\\  \n";
