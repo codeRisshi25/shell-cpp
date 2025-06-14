@@ -62,7 +62,6 @@ $RECYCLE.BIN/
 .AppleDesktop
 Network Trash Folder
 Temporary Items
-.apdisk
 
 ##### Android
 # Built application files
@@ -1046,3 +1045,4 @@ dkms.conf
 
 vcpkg_installed
 vcpkg/
+.clang-format

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(shell-starter-cpp)
+project(meow-shell)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.hpp)
 

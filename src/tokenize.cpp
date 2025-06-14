@@ -68,10 +68,6 @@ std::vector<std::string> tokenize(const std::string &input) {
         }
         mode = prevMode; // Reset to previous mode
       } else {
-        // if (i == 'n')
-        //     token.push_back('\n');
-        // else if (i == 't')
-        //     token.push_back('\t');
         if (i == '\\')
           token.push_back(' ');
         else {

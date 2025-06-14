@@ -146,6 +146,7 @@ std::string readLineWithCompletion() {
 }
 
 int main() {
+  initWelcome();
   init_builtins();
   initializeBuiltInTrie();
   initializeCmdTrie();

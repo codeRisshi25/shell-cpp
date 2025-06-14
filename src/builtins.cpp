@@ -113,11 +113,8 @@ void init_builtins() {
     int restrict= (args.size() > 1) ? std::stoi(args[1]) : -1;
     displayHistory(restrict);
   };
-  builtins["meow"] = [](const std::vector<std::string> &args) {
-    std::cout << "🐱 Meow! Welcome to MewoShell! 🐾\n";
-    std::cout << "   /\\_/\\  \n";
-    std::cout << "  ( o.o ) \n";
-    std::cout << "   > ^ <  \n";
+  builtins["mshell"] = [](const std::vector<std::string> &args) {
+    initWelcome();
   };
   builtins["cd"] = [](const std::vector<std::string> &args) {
     std::string dir = (args.size() > 1 ? args[1] : "~");
