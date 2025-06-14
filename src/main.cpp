@@ -42,7 +42,7 @@ public:
 std::string readLineWithCompletion() {
   std::string line;
   int c;
-  int tabCnt;
+  int tabCnt = 0;
 
   while ((c = getchar()) != EOF) {
     if (c == '\r' || c == '\n') {
@@ -68,7 +68,19 @@ std::string readLineWithCompletion() {
         line = suggestions[0] + " ";
         std::cout << line;
       } else {
+        std::string commonPrefix = searchLongestPrefix(suggestions);
         // Multiple completions - show them
+        if (commonPrefix.length() > line.length()) {
+          std::cout << "\r$ ";
+          for (size_t i = 0; i < line.length(); ++i) {
+            std::cout << " ";
+          }
+          std::cout << "\r$ ";
+
+          line = commonPrefix;
+          std::cout << line;
+          tabCnt = 0; // Reset tab counter
+        }
         tabCnt++;
         if (tabCnt < 2) {
           std::cout << "\a" << std::flush;

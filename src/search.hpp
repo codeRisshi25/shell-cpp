@@ -20,4 +20,5 @@ void collectAllCmds(SearchNode *node, const std::string currentWord,
 
 void initializeBuiltInTrie();
 void cleanupCommandTrie();
-void initializeCmdTrie();      
+void initializeCmdTrie();    
+std::string searchLongestPrefix(const std::vector<std::string> &suggestions);   

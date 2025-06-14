@@ -1,8 +1,8 @@
+#include "search.hpp"
+#include <algorithm>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "search.hpp"
-#include <algorithm>
 
 void insertSearchNode(SearchNode *root, const std::string &word) {
   SearchNode *node = root;
@@ -30,7 +30,7 @@ std::vector<std::string> getAuthCompleteSuggestions(SearchNode *root,
   std::vector<std::string> suggestions;
   collectAllCmds(node, prefix, suggestions);
 
-  std::sort(suggestions.begin(),suggestions.end());
+  std::sort(suggestions.begin(), suggestions.end());
   return suggestions;
 }
 
@@ -39,9 +39,24 @@ void collectAllCmds(SearchNode *node, const std::string currentWord,
   if (node->isEndOfCmd) {
     suggestions.push_back(currentWord);
   }
-  for (const auto& pair : node->children) {
+  for (const auto &pair : node->children) {
     char ch = pair.first;
-    SearchNode* childNode = pair.second;
+    SearchNode *childNode = pair.second;
     collectAllCmds(childNode, currentWord + ch, suggestions);
   }
+}
+std::string searchLongestPrefix(const std::vector<std::string> &suggestions) {
+  if (suggestions.empty())
+    return "";
+
+  std::string prefix = suggestions[0];
+  for (size_t i = 1; i < suggestions.size(); ++i) {
+    size_t j = 0;
+    while (j < prefix.length() && j < suggestions[i].length() &&prefix[j] == suggestions[i][j]){
+      j++;
+    }
+    prefix = prefix.substr(0,j);
+    if (prefix.empty())  break;
+  }
+  return prefix;
 }
