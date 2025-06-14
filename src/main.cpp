@@ -42,6 +42,7 @@ public:
 std::string readLineWithCompletion() {
   std::string line;
   int c;
+  int tabCnt;
 
   while ((c = getchar()) != EOF) {
     if (c == '\r' || c == '\n') {
@@ -49,6 +50,10 @@ std::string readLineWithCompletion() {
       break;
     } else if (c == '\t') {
       // Handle tab completion
+      if (line.empty()) {
+        std::cout << "\a" << std::flush; // dont suggest on empty line
+        continue;
+      }
       auto suggestions = getAuthCompleteSuggestions(globalCommandTrie, line);
       if (suggestions.empty()) {
         // No suggestions, just beep or do nothing
@@ -64,11 +69,17 @@ std::string readLineWithCompletion() {
         std::cout << line;
       } else {
         // Multiple completions - show them
+        tabCnt++;
+        if (tabCnt < 2) {
+          std::cout << "\a" << std::flush;
+          continue;
+        }
         std::cout << "\n";
         for (const auto &suggestion : suggestions) {
           std::cout << suggestion << "  ";
         }
         std::cout << "\n$ " << line;
+        tabCnt = 0;
       }
     } else if (c == 127 || c == '\b') {
       // Backspace
@@ -89,7 +100,7 @@ std::string readLineWithCompletion() {
 int main() {
   init_builtins();
   initializeBuiltInTrie();
-  initializeCmdTrie();      
+  initializeCmdTrie();
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 

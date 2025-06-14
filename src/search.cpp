@@ -29,6 +29,8 @@ std::vector<std::string> getAuthCompleteSuggestions(SearchNode *root,
   // Collecting all completions for that node
   std::vector<std::string> suggestions;
   collectAllCmds(node, prefix, suggestions);
+
+  std::sort(suggestions.begin(),suggestions.end());
   return suggestions;
 }
 
