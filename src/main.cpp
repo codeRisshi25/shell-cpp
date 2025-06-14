@@ -3,6 +3,7 @@
 #include "search.hpp"
 #include "tokenize.hpp"
 #include "util.hpp"
+#include "history.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -125,6 +126,7 @@ int main() {
   while (true) {
     std::cout << "$ ";
     std::string input = readLineWithCompletion();
+    addToHistory(input);
 
     auto args = tokenize(input);
     if (args.empty())

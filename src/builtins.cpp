@@ -2,6 +2,7 @@
 #include "enum.hpp"
 #include "search.hpp"
 #include "util.hpp"
+#include "history.hpp"
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
@@ -109,7 +110,7 @@ void init_builtins() {
     }
   };
   builtins["history"] = [](const std::vector<std::string> &args) {
-    std::cout << "history ~ one direction";
+    displayHistory();
   };
   builtins["meow"] = [](const std::vector<std::string> &args) {
     std::cout << "🐱 Meow! Welcome to MewoShell! 🐾\n";
