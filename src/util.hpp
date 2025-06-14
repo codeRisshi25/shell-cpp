@@ -9,3 +9,4 @@ void execCmdWithRedirect(const std::vector<std::string> &cmd,
                          const std::string &filename, write_mode mode);
 void execStderrCmdWithRedirect(const std::vector<std::string> &cmd,
                                const std::string &filename, write_mode mode);
+void initializeCmdTrie();                 

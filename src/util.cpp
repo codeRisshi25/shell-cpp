@@ -28,16 +28,17 @@ void initializeCmdTrie() {
   while (std::getline(iss, path, delimiter)) {
     try {
       for (const auto &entry : fs::directory_iterator(path)) {
-        if (entry.path().filename() == exec) { //! Add the commands the the insertSearchNode one by one
-          return entry.path().generic_string();
-          break;
-        }
+        // if (entry.path().filename() == exec) { //! Add the commands the the
+        // insertSearchNode one by one
+        //   return entry.path().generic_string();
+        //   break;
+        // }
+        insertSearchNode(globalCommandTrie, entry.path().filename().string());
       }
     } catch (fs::filesystem_error) {
       continue;
     }
   }
-  return "";
 }
 
 std::string execSearch(std::string exec) {

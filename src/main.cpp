@@ -89,6 +89,7 @@ std::string readLineWithCompletion() {
 int main() {
   init_builtins();
   initializeBuiltInTrie();
+  initializeCmdTrie();      
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 

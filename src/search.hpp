@@ -20,4 +20,4 @@ void collectAllCmds(SearchNode *node, const std::string currentWord,
 
 void initializeBuiltInTrie();
 void cleanupCommandTrie();
-void cleanupSearchNodeRecursive(SearchNode* node); 
+void initializeCmdTrie();      
