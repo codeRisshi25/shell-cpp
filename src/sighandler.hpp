@@ -17,7 +17,7 @@ void handle_sigint(int signum) {
     exit(signum);
 }
 
-/// Termination Signal
+/// Termination Signal (kill -SIGTERM {pid})
 /// @param signum Signal Number: 15
 void handle_sigterm(int signum) {
     std::cout << "\nSIGTERM INVOKED...\n";
