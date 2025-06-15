@@ -1,4 +1,4 @@
-# 🐚 MShell
+# 🐱 MShell
 ![alt text](image.png)
 
 A modern, feature-rich POSIX-compliant shell implementation written in C++23.
