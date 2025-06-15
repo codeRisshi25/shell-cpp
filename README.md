@@ -58,7 +58,7 @@ $ <↑>                          # Command history
 
 ## 🔮 Future Plans
 
-- [ ] Signal handling (`Ctrl+C`, `Ctrl+Z`)
+- [X] Signal handling (`Ctrl+C`, `Ctrl+Z`)
 - [ ] Syntax highlighting
 - [ ] Pipe support (`|`)
 - [ ] Job control (`&`, `jobs`, `fg`, `bg`) 
@@ -88,4 +88,4 @@ src/
 
 ---
 
-Made with ❤️ by Risshi
+Contributions are Welcome !
