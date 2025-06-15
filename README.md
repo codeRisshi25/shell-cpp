@@ -1,129 +1,91 @@
-# Shell C++ Implementation
+# 🐚 MShell
+![alt text](image.png)
 
-A POSIX-compliant shell implementation written in modern C++ (C++23) that provides standard shell functionality with support for command execution, built-in commands, and I/O redirection.
+A modern, feature-rich POSIX-compliant shell implementation written in C++23.
 
-## Features
+## ✨ Features
 
-### ✅ Implemented Features
+- **Smart Tab Completion** - Trie-based command indexing with prefix matching
+- **Command History** - Navigate with arrow keys (↑/↓)
+- **I/O Redirection** - Full support for `>`, `>>`, `2>`, `2>>`, `1>`, `1>>`
+- **Raw Terminal Mode** - Real shell-like experience
+- **Finite State Machine Tokenizer** - Robust parsing with quote and escape support
+- **Built-in Commands** - `echo`, `pwd`, `cd`, `exit`, `type`, `history`, `mshell`
+- **PATH Discovery** - Auto-completion for system commands
 
-#### POSIX Shell Compliance
-- **Interactive Command Prompt**: Standard `$ ` prompt with line-by-line input processing
-- **POSIX Command Tokenization**: Standards-compliant tokenizer supporting:
-  - Single quotes (`'text'`) - literal interpretation per POSIX
-  - Double quotes (`"text"`) - parameter expansion context
-  - Escape sequences (`\n`, `\t`, `\\`) following POSIX rules
-  - Mixed quoting scenarios as per shell grammar
+## 🚀 Quick Start
 
-#### POSIX Built-in Commands
-- **`exit [code]`**: Exit shell with optional exit status (POSIX.1-2017)
-- **`echo [args...]`**: Write arguments to standard output
-- **`type <command>`**: Display command classification (builtin/external)
-- **`pwd`**: Print current working directory pathname
-- **`cd [directory]`**: Change working directory (supports `~` expansion)
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/shell-cpp.git
+cd shell-cpp
 
-#### External Command Execution
-- **PATH Resolution**: Standard PATH environment variable processing
-- **Process Management**: POSIX fork/exec model implementation
-- **Wait Operations**: Proper child process reaping with `waitpid()`
-- **Exit Status**: Standard exit code propagation
+# Build and run
+./build.sh
+```
 
-#### I/O Redirection (POSIX)
-- **Output Redirection**:
-  - `>` - Redirect stdout (create/truncate)
-  - `1>` - Explicit stdout redirect
-  - `>>` - Redirect stdout (append)
-  - `1>>` - Explicit stdout append
+## 🔧 Building Locally
 
-- **Error Redirection**:
-  - `2>` - Redirect stderr (create/truncate)
-  - `2>>` - Redirect stderr (append)
+**Prerequisites:**
+- C++23 compatible compiler (GCC 13+ or Clang 15+)
+- CMake 3.13+
+- vcpkg (included as submodule)
 
-#### Advanced Parsing
-- **POSIX Quote Removal**: Proper quote processing per shell grammar
-- **Escape Processing**: Context-sensitive backslash handling
-- **Syntax Validation**: Error detection for malformed commands
+**Build Steps:**
+```bash
+# Initialize vcpkg submodule
+git submodule update --init --recursive
 
-## Architecture
+# Build with CMake
+mkdir build && cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
+make
 
-### Modular Design
+# Run the shell
+./shell
+```
+
+## 🎯 Usage Examples
+
+```bash
+$ echo "Hello, World!"          # Built-in commands
+$ ls -la                        # External commands  
+$ echo "output" > file.txt      # I/O redirection
+$ cat file.txt 2> error.log     # Error redirection
+$ his<TAB>                      # Tab completion → history
+$ <↑>                          # Command history
+```
+
+## 🔮 Future Plans
+
+- [ ] Signal handling (`Ctrl+C`, `Ctrl+Z`)
+- [ ] Syntax highlighting
+- [ ] Pipe support (`|`)
+- [ ] Job control (`&`, `jobs`, `fg`, `bg`) 
+- [ ] Configuration file support
+- [ ] Plugin system for custom commands
+
+## 📁 Project Structure
+
 ```
 src/
-├── main.cpp          # Main shell loop and redirection logic
-├── tokenize.cpp/hpp  # POSIX-compliant tokenization
-├── builtins.cpp/hpp  # Built-in command implementations
-└── util.cpp/hpp      # External command execution utilities
+├── main.cpp          # Terminal management & main loop
+├── tokenize.cpp      # FSM-based tokenizer
+├── builtins.cpp      # Built-in command implementations
+├── search.cpp        # Trie-based command completion
+├── history.cpp       # Command history management
+└── util.cpp          # System utilities & PATH handling
 ```
 
-### POSIX Compliance
-- Follows POSIX.1-2017 shell specification
-- Standard file descriptor handling (0=stdin, 1=stdout, 2=stderr)
-- Proper signal handling for interactive use
-- Environment variable inheritance
+## 🛠️ Technical Highlights
 
-## Building and Running
-
-### Prerequisites
-- CMake 3.13+
-- POSIX-compliant system (Linux, macOS, Unix)
-- C++23 compatible compiler
-
-### Build Instructions
-```bash
-cd shell-cpp
-./your_program.sh
-```
-
-## Usage Examples
-
-### POSIX Shell Operations
-```bash
-$ echo "Hello, World!"
-Hello, World!
-
-$ pwd
-/home/user/projects
-
-$ type echo
-echo is a shell builtin
-
-$ ls nonexistent 2> /dev/null
-$ echo $?
-2
-```
-
-## Future Features
-
-### 🔲 Command Line Enhancement
-- [ ] Tab completion for commands and paths
-- [ ] Command history with up/down arrows
-- [ ] Reverse search (Ctrl+R)
-- [ ] History expansion (`!!`, `!n`)
-
-### 🔲 POSIX Pipeline Support  
-- [ ] Command pipelines (`cmd1 | cmd2`)
-- [ ] Pipeline exit status handling
-- [ ] Multi-stage pipeline support
-
-### 🔲 Interactive Features
-- [ ] Line editing capabilities
-- [ ] Syntax highlighting
-- [ ] Auto-suggestion
-- [ ] Configuration file support (`.shellrc`)
-
-## Technical Details
-
-### POSIX Compliance
-- Implements core POSIX shell features
-- Standard exit codes and error handling
-- Proper signal disposition
-- Environment variable management
-
-### System Integration
-- **File Operations**: POSIX file I/O (`open()`, `dup2()`, `close()`)
-- **Process Control**: Standard process creation (`fork()`, `exec()`)
-- **Signal Handling**: POSIX signal management
-- **Error Reporting**: Standard errno-based error handling
+- **Finite State Machine** tokenizer for robust command parsing
+- **Trie data structure** for efficient command completion
+- **Raw terminal control** using termios for real-time input
+- **Process management** with fork/exec for external commands
+- **File descriptor manipulation** for I/O redirection
+- **Modern C++23** features with memory-safe design patterns
 
 ---
 
-*A standards-compliant shell implementation showcasing modern C++ design patterns while adhering to POSIX shell specifications.*
+Made with ❤️ by Risshi
