@@ -4,6 +4,7 @@
 #include "tokenize.hpp"
 #include "util.hpp"
 #include "history.hpp"
+#include "sighandler.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -155,6 +156,10 @@ int main() {
 
   TerminalManager terminal;
   terminal.enableRawMode();
+
+  signal(SIGINT, handle_sigint);
+  signal(SIGTSTP, handle_sigtstp);
+  signal(SIGTERM, handle_sigterm);
 
   out_type redirect_type = out_type::STDOUT;
   write_mode mode = write_mode::TRUNCATE;
